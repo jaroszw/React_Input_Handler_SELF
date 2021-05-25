@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import styled from "styled-components";
+import useInput from "../hooks/use-input";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -15,11 +16,11 @@ const UserButton = styled.button`
   border: none;
   padding: 0.5rem;
   border-radius: 3px;
-  background-color: ${(props) => (props.disabled ? '#333' : '')};
-  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+  background-color: ${(props) => (props.disabled ? "#333" : "")};
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 
   :hover {
-    background-color: ${(props) => (props.disabled ? '#333' : '#99154e')};
+    background-color: ${(props) => (props.disabled ? "#333" : "#99154e")};
   }
 `;
 
@@ -29,9 +30,10 @@ const UserForm = styled.form`
   padding: 3rem;
   background-color: #d99879;
 `;
+
 const UserInput = styled.input`
-  border: 1px solid ${(props) => (props.valid ? 'green' : 'red')};
-  background-color: ${(props) => (props.valid ? 'yellow' : 'brown')};
+  border: 1px solid ${(props) => (props.invalid ? "#e93b81" : "")};
+  background-color: ${(props) => (props.invalid ? "#f5abc9" : "")};
   padding: 5px;
   border-radius: 3px;
   margin-bottom: 5px;
@@ -39,40 +41,37 @@ const UserInput = styled.input`
 `;
 
 const Input = () => {
-  const [enteredName, setEnteredName] = useState('');
-  const [nameIsTouched, setNameIsTouched] = useState(false);
+  const {
+    value: nameValue,
+    inputError: nameHasError,
+    chandgeHandler: nameChangeHandler,
+    touchHandler: nameTouchedHandler,
+    reset: nameReset,
+  } = useInput((value) => value.trim() !== "");
 
-  const nameIsValid = enteredName.trim() !== '';
-  const nameInputIsInvalid = !nameIsValid && nameIsTouched;
+  const {
+    value: emailValue,
+    inputError: emailHasError,
+    chandgeHandler: emailChangeHandler,
+    touchHandler: emailTouchedHandler,
+    reset: emailReset,
+  } = useInput((value) => value.includes("@"));
 
   let formIsValid = false;
-
-  if (enteredName) {
+  if (emailValue && nameValue) {
     formIsValid = true;
   }
 
-  const nameInputChangeHandler = (e) => {
-    setEnteredName(e.target.value);
-  };
-
-  const nameInputBlurHandler = (e) => {
-    setNameIsTouched(true);
-  };
-
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    setNameIsTouched(true);
 
-    if (!nameIsValid) {
+    if (nameHasError || emailHasError) {
       return;
     }
 
-    setEnteredName('');
-    setNameIsTouched(false);
+    nameReset();
+    emailReset();
   };
-
-  const test = false;
-  const test2 = true;
 
   return (
     <Wrapper>
@@ -82,10 +81,10 @@ const Input = () => {
             <UserInput
               type="text"
               id="name"
-              onChange={nameInputChangeHandler}
-              onBlur={nameInputBlurHandler}
-              value={enteredName}
-              valid={+test}
+              onChange={nameChangeHandler}
+              onBlur={nameTouchedHandler}
+              value={nameValue}
+              invalid={nameHasError}
             />
           </label>
         </div>
@@ -93,12 +92,12 @@ const Input = () => {
         <div>
           <label htmlFor="">
             <UserInput
-              type="text"
-              id="name"
-              onChange={nameInputChangeHandler}
-              onBlur={nameInputBlurHandler}
-              value={enteredName}
-              valid={+test2}
+              type="email"
+              id="email"
+              onChange={emailChangeHandler}
+              onBlur={emailTouchedHandler}
+              value={emailValue}
+              invalid={emailHasError}
             />
           </label>
         </div>
