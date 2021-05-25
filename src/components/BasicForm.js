@@ -28,8 +28,6 @@ const BasicForm = () => {
     reset: emailResetInput,
   } = useInput((value) => value.includes("@"));
 
-  console.log(emailIsInvalid);
-
   const nameIsValidClass = nameIsInvalid
     ? "form-control invalid"
     : "form-control";
@@ -45,10 +43,6 @@ const BasicForm = () => {
   const onSubmitHandler = (e) => {
     console.log("Working");
     e.preventDefault();
-    nameTouchedInputHandler();
-    lastnameTouchedInputHandler();
-    emailTouchedInputHandler();
-
     // if (!nameIsValid || !lastnameIsValid || !emailIsValid) {
     //   console.log("INVALID");
     //   return;

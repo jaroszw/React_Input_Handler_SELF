@@ -1,33 +1,64 @@
-import { useState } from "react";
+import { useState, useReducer } from "react";
+
+const initialInputState = {
+  value: "",
+  isTouched: false,
+};
+
+const inputStateReducer = (state, action) => {
+  switch (action.type) {
+    case "INPUT": {
+      return {
+        ...state,
+        value: action.value,
+      };
+    }
+    case "TOUCHED": {
+      return {
+        ...state,
+        isTouched: true,
+      };
+    }
+    case "RESET": {
+      return {
+        isTouched: false,
+        value: "",
+      };
+    }
+    default:
+      return state;
+  }
+};
 
 const useInput = (validateValue) => {
-  const [enteredValue, setEneteredValue] = useState("");
-  const [isTouched, setIsTouched] = useState(false);
+  const [inputState, dispatch] = useReducer(
+    inputStateReducer,
+    initialInputState
+  );
 
-  const valueIsValid = validateValue(enteredValue);
-  const valueIsInvalid = !valueIsValid && isTouched;
+  const valueIsValid = validateValue(inputState.value);
+  const valueIsInvalid = !valueIsValid && inputState.isTouched;
 
   const inputChangeHandler = (e) => {
-    setEneteredValue(e.target.value);
+    dispatch({ type: "INPUT", value: e.target.value });
   };
 
   const touchedInputHandler = () => {
-    setIsTouched(true);
+    dispatch({ type: "TOUCHED" });
   };
 
   const resetInput = () => {
-    setIsTouched(false);
-    setEneteredValue("");
+    dispatch({ type: "RESET" });
   };
 
   return {
-    value: enteredValue,
+    value: inputState.value,
     inputError: valueIsInvalid,
     chandgeHandler: inputChangeHandler,
     touchHandler: touchedInputHandler,
     reset: resetInput,
-    isTouched: isTouched,
-    IsValid: valueIsValid,
+    isTouched: inputState.isTouched,
+    isValid: valueIsValid,
   };
 };
 
